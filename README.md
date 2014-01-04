@@ -2,6 +2,7 @@ myQuery
 =======
 
 myQuery(MikeQuery) my attempt to understand the architecture and design behind jQuery. 
+
 It's written without reading any kind of documentation, while maintaining the same results expected from the original jQuery methods.
 
 I'm slowly moving from methods iu believe are basic, to the ones i think are complex.
