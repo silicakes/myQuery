@@ -13,4 +13,4 @@ I'm enjoying hacking it up from scratch.
 
 Not sure whether this is going somewhere, but it might be of use to some curious minds, 
 
-so i'll try keep everything documented.
+so i'll try keep everything documented inside the source code itself.
