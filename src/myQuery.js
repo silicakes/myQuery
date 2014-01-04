@@ -27,8 +27,24 @@
 * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+//letting jshint know that window is defined elsewhere
+//http://www.jshint.com/docs/ -> Inline configuration
+
+/*global window */
+
 (function(window) {
-	window.myQuery = window.myQuery || myQuery;
+
+	/*
+	* The main $ function which in jQuery invokes the sizzle engine, which helps
+	* - finding the element that will be passed into the constructur. The newly constructed
+	* element will be reuturned so that its methods could be run directly via $().method({params})
+	* Here it's used as a simple delegate for binding the $ to myQuery
+	*/
+
+
+	window.myQuery = window.$ = window.myQuery || myQuery;
+
+
 	/*utils
 	* Various helper methods for the main myQuery functions
 	*/
@@ -40,6 +56,18 @@
 		this.classArray = classes.split(" ");
 	}
 
+	// converts stylesheet syntaxed css into a js one,
+	// ie: background-color -> backgrouncColor
+	function convertCSStoJS(str) {
+		var arr = str.split("-"), i;
+		for(i = 1;i < arr.length; i++) {
+			//http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript#answer-1026087
+			arr[i] = arr[i].charAt(0).toUpperCase() + arr[i].slice(1);
+		}
+		return arr.join("");
+	}
+
+
 	/***Abstraction layer***/
 
 	/* 
@@ -48,32 +76,33 @@
 	*  These functions are kept separate for the sake of readability 
 	*/
 
-
 	function hasClass(el, targetClass) {
-		var classObject = new cssClass(el.className, targetClass);
-		for(var i = 0; i < classObject.classArray.length; i++) {
+		var i,
+		classObject = new cssClass(el.className, targetClass);
+		for(i = 0; i < classObject.classArray.length; i++) {
 			if(!!classObject.classArray[i].match(classObject.classRegex)) {
 				return true;
 			}
 		}
-		return false
+		return false;
 	}
 
 	function addClass(el, targetClass) {
-		if(el.className.indexOf(targetClass) != -1) return;
+		if(el.className.indexOf(targetClass) !== -1) { return; }
 
 		var arr = el.className.split(" ");
 		arr.push(targetClass);
 
-		el.className = 	el.className.length === 0 || 
-						(el.className.indexOf(" ") != -1 && el.className.length == 1) || 
-						arr.length === 1 ? arr.join("") : arr.join(" ");
+		el.className =	el.className.length === 0 ||
+										(el.className.indexOf(" ") !== -1 && el.className.length === 1) ||
+										arr.length === 1 ? arr.join("") : arr.join(" ");
 	}
 
 	function removeClass(el, targetClass) {
-		var classObject = new cssClass(el.className, targetClass);
+		var i,
+		classObject = new cssClass(el.className, targetClass);
 		
-		for(var i = 0; i < classObject.classArray.length; i++) {
+		for(i = 0; i < classObject.classArray.length; i++) {
 			if(!!classObject.classArray[i].match(classObject.classRegex)) {
 				classObject.classArray.splice(i, 1);
 				break;
@@ -81,7 +110,7 @@
 		}
 
 		//trimming the last whitespace if there is one
-		if(classObject.classArray[classObject.classArray.length - 1] == "") {
+		if(classObject.classArray[classObject.classArray.length - 1] === "") {
 			el.className = classObject.classArray.pop().join(" ");
 		}
 
@@ -92,31 +121,67 @@
 		hasClass(el, targetClass) ? removeClass(el, targetClass) : addClass(el, targetClass);
 	}
 
+	function css(el) {
+		var x, convertedProperty;
+		//	$el.css();
+		if(arguments[1].length === 0) {
+			return window.getComputedStyle(el);
+		} else if(arguments[1].length === 1) {
+
+			//	$el.css("param");
+			if(typeof arguments[1][0] === "string") {
+					return window.getComputedStyle(el)[arguments[1][0]];
+
+			//	$el.css({
+			//	param: value, 
+			//	anotherParam: anotherValue});
+			} else if(typeof arguments[1][0] === "object") {
+				for(x in arguments[1][0]) {
+					convertedProperty = x;
+					if(convertedProperty.indexOf("-") !== -1) {
+						convertedProperty = convertCSStoJS(convertedProperty);
+					}
+					el.style[convertedProperty] = arguments[1][0][x];
+				}
+				return this;
+			}
+
+			//	$el.css(param, value);
+		} else if(arguments[1].length === 2 && typeof arguments[1][0] === "string" && typeof arguments[1][1] === "string"){
+				convertedProperty = arguments[1][0];
+				if(convertedProperty.indexOf("-") !== -1) {
+					convertedProperty = convertCSStoJS(arguments[1][0]);
+				}
+				el.style[convertedProperty] = arguments[1][1];
+				return this;
+			}
+	}
+
 	function index(el) {
-		var parent = el.parentNode;
+		var parent = el.parentNode, children, i;
 		//  splitting for readability: making the childNodes pseudo array into a real one:
 		//  http://stackoverflow.com/questions/7056925/how-does-array-prototype-slice-call-work#answer-7057090
-		var children = Array.prototype.slice.call(parent.childNodes);
+		children = Array.prototype.slice.call(parent.childNodes);
 		
 		// filtering out the textNodes, although filter is now a part of ECMAscript 5.1,
 		// there's much to learn from: 
 		// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter#Compatibility
-		children = children.filter(function(el) { return el.nodeName != "#text" })
+		children = children.filter(function(el) { return el.nodeName !== "#text"; });
 		for(i = 0;i < children.length;i++) {
-			if(children[i] == el) {
-				return i;   
+			if(children[i] === el) {
+				return i;
 			}
 		}
 	}
 
 	/*
-	* This is the myQuery constructor which wraps the element with various helper methods.
+	*  This is the myQuery constructor which wraps the element with various helper methods.
 	*  These methods are delegated from the functions specified above. since they are boolean,
 	*  there's no need to return the object after calling it (for now)
 	*/
 
 	function myQuery(el) {
-		if(arguments.length < 1) return [];
+		if(arguments.length < 1) { return []; }
 
 		// if the first parameter isn't an instance of the constructur,
 		// we'll recursively make it one
@@ -134,33 +199,24 @@
 		this.element = el;
 		// notice that we pass the expected params from the $().method(params) into the wrapping function
 		// arguments which the user shouldn't be aware of, are passed by default
-		this.hasClass =  function(targetClass) { 
-			return hasClass(this.element, targetClass)
-		}
+		this.hasClass =  function(targetClass) {
+			return hasClass(this.element, targetClass);
+		};
 		this.addClass = function(targetClass) {
 			addClass(this.element, targetClass);
-		}
+		};
 		this.removeClass = function(targetClass) {
 			removeClass(this.element, targetClass);
-		}
+		};
 		this.toggleClass = function(targetClass) {
 			toggleClass(this.element, targetClass);
-		}
+		};
+		this.css = function() {
+			return css.call(this,this.element, arguments);
+		};
 		this.index = function() {
 			return index(this.element);
-		}
-
-		//return this;
-	}
-
-	/*
-	* The main $ function which in jQuery invokes the sizzle engine, which helps
-	* - finding the element that will be passed into the constructur. The newly constructed
-	* element will be reuturned so that its methods could be run directly via $().method({params})
-	* Here it's used as a simple delegate for binding the $ to myQuery
-	*/
-	function $(el) {
-		 var t = myQuery(el);
+		};
 	}
 
 	/***End of abstraction layer***/

@@ -27,7 +27,9 @@
 	element.className = "test-class";
 	var $el = $(element);
 
-
+		test("$ equals myQuery", function() {
+			ok($ === myQuery, "$ isn't equal to the myQuery object");
+		});
 
 	test("$ creates an instance of myQuery", function() {
 		ok($el instanceof myQuery, "$(element) failed to create a myQuery instance");
@@ -68,6 +70,32 @@
 		ok(!$el.hasClass("car"), "toggleClass failed removing a class");
 	});
 
+	test("css method", function() {
+		// $el.css()
+		var cssElement = $el.css();
+		ok(cssElement instanceof CSSStyleDeclaration, "the empty css() method does not return the elements style object");
+
+		//$el.css(prop);
+		$el.element.style.height = "500px";
+		//TODO change the test to work with cssText: http://www.quirksmode.org/dom/w3c_css.html
+		equal($el.css("height"), window.getComputedStyle($el.element).height, "getting a specific css value failed");	
+		
+		//$el.css(prop, val);
+		$el.css("background-color", "black");
+		equal($el.element.style.backgroundColor, "black", "single style assignment failed");
+
+		//$el.css({prop: value});
+		$el.css({
+			"background-color": "blue",
+			cursor: "pointer",
+			"font-size": "20px"
+		});
+
+		equal($el.element.style.backgroundColor, "blue", "Assignment of object css failed [background-color]");
+		equal($el.element.style.cursor, "pointer", "Assignment of object css failed [cursor]");
+		equal($el.element.style.fontSize, "20px", "Assignment of object css failed [cursor]");
+	})
+
 	test("index", function() {
 		var state = true;
 		for(i = 0;i < 5;i++) {
@@ -77,9 +105,7 @@
 			if(!($(a).index() === a.index)) 
 				state = false;
 		}
-
 		ok(state, "index() failed");
-
 	});
 
 }(myQuery));

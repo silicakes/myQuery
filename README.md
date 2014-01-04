@@ -1,7 +1,7 @@
 myQuery
 =======
 
-myQuery(MikeQuery) my attempt to understand the architecture and design behind jQuery. 
+myQuery(MikeQuery) is my attempt to understand the architecture and design behind jQuery. 
 
 It's written without reading any kind of documentation, while maintaining the same results expected from the original jQuery methods.
 
@@ -18,3 +18,19 @@ so i'll try keep everything documented inside the source code itself.
 enjoy the show,
 
 Michael.
+
+Change log
+==========
+v.0.0.2
+- css()
+- removed redudndant $ delegate
+- added myQuery to the global namespace 
+- added jshint QA
+
+v.0.0.1
+- Added qUnit tests 
+- hasClass()
+- addClass()
+- removeClass()
+- classToggle()
+- index();

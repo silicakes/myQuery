@@ -1,8 +1,8 @@
 {
   "name": "myQuery",
-  "version": "0.0.1",
-  "description": "A 1hr attempt to understand the architecture and design behind jQuery.",
-  "main": "myQuery.0.0.1.js",
+  "version": "0.0.2",
+  "description": "An attempt to understand the architecture and design behind jQuery.",
+  "main": "myQuery.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -35,6 +35,7 @@
     "karma-phantomjs-launcher": "~0.1.1",
     "karma": "~0.10.9",
     "qunitjs": "~1.12.0",
-    "karma-qunit": "~0.1.1"
+    "karma-qunit": "~0.1.1",
+    "grunt-contrib-jshint": "~0.8.0"
   }
 }
